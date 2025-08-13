@@ -1,0 +1,32 @@
+schemaVersion: v0.2
+prepare:
+  steps:
+    - name: install backend dependencies
+      command: cd backend && mvn clean compile
+    - name: prepare frontend
+      command: cd frontend && echo "Frontend prepared - static files ready"
+test:
+  steps:
+    - name: run backend tests
+      command: cd backend && mvn test
+run:
+  frontend:
+    steps:
+      - name: serve frontend static files
+        command: "cd frontend && python3 -m http.server 3000"
+    plan: 8
+    replicas: 1
+    isPublic: true
+    network:
+      path: /
+      stripPath: false
+  backend:
+    steps:
+      - name: start backend application
+        command: cd backend && mvn spring-boot:run
+    plan: 8
+    replicas: 1
+    isPublic: false
+    network:
+      path: /api
+      stripPath: false

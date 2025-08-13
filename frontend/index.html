@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to PDF Converter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        #markdown-input {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        #markdown-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .button-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #convert-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #convert-btn:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+        
+        #convert-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .example {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .example h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .example-content {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Markdown to PDF Converter</h1>
+        
+        <div class="input-section">
+            <label for="markdown-input">Enter your Markdown content:</label>
+            <textarea id="markdown-input" placeholder="Type your Markdown here...
+
+Example:
+# My Document
+This is a **bold** text and this is *italic*.
+
+## Features
+- Convert Markdown to PDF
+- Beautiful styling
+- Easy to use
+
+```javascript
+console.log('Hello, World!');
+```
+
+> This is a blockquote example."></textarea>
+        </div>
+        
+        <div class="button-section">
+            <button id="convert-btn">Convert to PDF</button>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="example">
+            <h3>Example Markdown:</h3>
+            <div class="example-content"># My Document
+
+This is a **bold** text and this is *italic*.
+
+## Features
+- Convert Markdown to PDF
+- Beautiful styling
+- Easy to use
+
+```javascript
+console.log('Hello, World!');
+```
+
+> This is a blockquote example.
+
+### Table Example
+| Feature | Status |
+|---------|--------|
+| Markdown Support | ✅ |
+| PDF Generation | ✅ |
+| Styling | ✅ |</div>
+        </div>
+    </div>
+
+    <script>
+        const markdownInput = document.getElementById('markdown-input');
+        const convertBtn = document.getElementById('convert-btn');
+        const statusDiv = document.getElementById('status');
+
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusDiv.style.display = 'none';
+        }
+
+        convertBtn.addEventListener('click', async function() {
+            const markdownContent = markdownInput.value.trim();
+            
+            if (!markdownContent) {
+                showStatus('Please enter some Markdown content.', 'error');
+                return;
+            }
+
+            // Disable button and show loading state
+            convertBtn.disabled = true;
+            convertBtn.textContent = 'Converting...';
+            showStatus('Converting Markdown to PDF...', 'loading');
+
+            try {
+                const response = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        markdown: markdownContent
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get the PDF blob from response
+                const blob = await response.blob();
+                
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'document.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showStatus('PDF generated and download started!', 'success');
+
+            } catch (error) {
+                console.error('Error converting markdown:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                // Re-enable button
+                convertBtn.disabled = false;
+                convertBtn.textContent = 'Convert to PDF';
+                
+                // Hide status after 5 seconds
+                setTimeout(hideStatus, 5000);
+            }
+        });
+
+        // Auto-hide status when user starts typing
+        markdownInput.addEventListener('input', function() {
+            if (statusDiv.style.display !== 'none') {
+                setTimeout(hideStatus, 1000);
+            }
+        });
+
+        // Handle Enter key in textarea (Ctrl+Enter to convert)
+        markdownInput.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                convertBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
