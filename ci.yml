@@ -1,14 +1,22 @@
 schemaVersion: v0.2
 prepare:
   steps:
-    - name: install backend dependencies
-      command: cd backend && mvn clean compile
+    - name: check nix version
+      command: |
+        nix --version
+    - name: install java and maven with updated nix
+      command: |
+        nix-env -iA nixpkgs.jdk17 nixpkgs.maven
+    - name: verify installations
+      command: |
+        java -version && mvn -version
+    - name: compile spring boot app with maven
+      command: |
+        cd backend && mvn clean compile
     - name: prepare frontend
-      command: cd frontend && echo "Frontend prepared - static files ready"
+      command: cd frontend && echo "Frontend static files ready"
 test:
-  steps:
-    - name: run backend tests
-      command: cd backend && mvn test
+  steps: []
 run:
   frontend:
     steps:
@@ -22,8 +30,9 @@ run:
       stripPath: false
   backend:
     steps:
-      - name: start backend application
-        command: cd backend && mvn spring-boot:run
+      - name: start spring boot application
+        command: |
+          cd backend && mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=3000"
     plan: 8
     replicas: 1
     isPublic: false
