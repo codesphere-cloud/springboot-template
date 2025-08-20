@@ -39,4 +39,4 @@ run:
     isPublic: true
     network:
       path: /api
-      stripPath: false
+      stripPath: true

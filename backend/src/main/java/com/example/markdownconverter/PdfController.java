@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class PdfController {
 
