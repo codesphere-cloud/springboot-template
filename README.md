@@ -1,6 +1,6 @@
 # Markdown to PDF Converter
 
-A web application that converts Markdown text to PDF files using Python Flask backend and a simple HTML/JavaScript frontend.
+A web application that converts Markdown text to PDF files using Spring Boot backend and a simple HTML/JavaScript frontend.
 
 ## Features
 
@@ -19,10 +19,10 @@ A web application that converts Markdown text to PDF files using Python Flask ba
 ## Technology Stack
 
 ### Backend
-- **Python 3** with **Flask**
-- **Python Markdown** for Markdown parsing
-- **WeasyPrint** for PDF generation
-- **Flask-CORS** for cross-origin requests
+- **Java 17+** with **Spring Boot**
+- **Spring Web** for REST API
+- **Apache PDFBox** or similar library for PDF generation
+- **CORS** configured for cross-origin requests
 
 ### Frontend
 - **HTML5** with modern CSS
@@ -34,8 +34,15 @@ A web application that converts Markdown text to PDF files using Python Flask ba
 ```
 /
 ├── backend/
-│   ├── app.py
-│   └── requirements.txt
+│   ├── pom.xml
+│   └── src/
+│       └── main/
+│           └── java/
+│               └── com/
+│                   └── example/
+│                       └── markdownconverter/
+│                           ├── MarkdownConverterApplication.java
+│                           └── PdfController.java
 ├── frontend/
 │   └── index.html
 ├── ci.yml
@@ -70,8 +77,8 @@ Converts Markdown text to PDF.
 ### Backend
 ```bash
 cd backend
-pip install -r requirements.txt
-python app.py
+mvn clean install
+mvn spring-boot:run
 ```
 
 The backend will start on `http://localhost:8080`
@@ -132,10 +139,10 @@ console.log('Hello, World!');
 ## Dependencies
 
 ### Backend Dependencies
-- `flask`: Web framework
-- `flask-cors`: Cross-origin resource sharing
-- `markdown`: Markdown parsing with extensions
-- `weasyprint`: HTML to PDF conversion
+- `spring-boot-starter-web`: Web framework and REST API
+- `spring-boot-starter`: Core Spring Boot features
+- Markdown parsing library (configured in pom.xml)
+- PDF generation library (configured in pom.xml)
 
 ### Frontend Dependencies
 - No external dependencies - uses vanilla JavaScript
