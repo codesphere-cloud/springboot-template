@@ -1,9 +1,6 @@
 schemaVersion: v0.2
 prepare:
   steps:
-    - name: check nix version
-      command: |
-        nix --version
     - name: install java and maven with updated nix
       command: |
         nix-env -iA nixpkgs.jdk17 nixpkgs.maven
